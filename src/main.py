@@ -78,6 +78,18 @@ print(
     recommend_products(sample_product)
 )
 
+print("\n================================================")
+print("RECOMMENDATION SYSTEM TEST")
+print("================================================")
+
+sample_product = df['product_name'].iloc[0]
+
+print(f"\nRecommendations for: {sample_product}\n")
+
+print(
+    recommend_products(sample_product)
+)
+
 # =====================================================
 # 10. STOP SPARK
 # =====================================================

@@ -3,6 +3,8 @@
 # EXPLORATORY DATA ANALYSIS (EDA)
 # =========================================================
 
+import os
+
 import pandas as pd
 import numpy as np
 
@@ -10,6 +12,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from wordcloud import WordCloud
+
+# =========================================================
+# CREATE OUTPUTS FOLDER
+# =========================================================
+
+os.makedirs("outputs", exist_ok=True)
 
 # =========================================================
 # EDA FUNCTION
@@ -61,12 +69,15 @@ def perform_eda(df, spark_df):
 
     sns.heatmap(
         df.isnull(),
-        cbar=False
+        cbar=False,
+        cmap='viridis'
     )
 
     plt.title("Missing Values Heatmap")
 
     plt.tight_layout()
+
+    plt.savefig("outputs/missing_values_heatmap.png")
 
     plt.show()
 
@@ -99,6 +110,8 @@ def perform_eda(df, spark_df):
 
         plt.tight_layout()
 
+        plt.savefig("outputs/price_distribution.png")
+
         plt.show()
 
     # =====================================================
@@ -116,6 +129,8 @@ def perform_eda(df, spark_df):
         plt.title("Price Outliers")
 
         plt.tight_layout()
+
+        plt.savefig("outputs/price_outliers.png")
 
         plt.show()
 
@@ -155,6 +170,8 @@ def perform_eda(df, spark_df):
 
         plt.tight_layout()
 
+        plt.savefig("outputs/top_categories.png")
+
         plt.show()
 
     # =====================================================
@@ -192,6 +209,8 @@ def perform_eda(df, spark_df):
         plt.ylabel("Count")
 
         plt.tight_layout()
+
+        plt.savefig("outputs/text_length_distribution.png")
 
         plt.show()
 
@@ -231,6 +250,8 @@ def perform_eda(df, spark_df):
 
         plt.tight_layout()
 
+        plt.savefig("outputs/product_name_length_distribution.png")
+
         plt.show()
 
     # =====================================================
@@ -260,6 +281,8 @@ def perform_eda(df, spark_df):
 
         plt.tight_layout()
 
+        plt.savefig("outputs/wordcloud.png")
+
         plt.show()
 
     # =====================================================
@@ -285,6 +308,8 @@ def perform_eda(df, spark_df):
         plt.title("Correlation Matrix")
 
         plt.tight_layout()
+
+        plt.savefig("outputs/correlation_matrix.png")
 
         plt.show()
 
@@ -317,8 +342,9 @@ def perform_eda(df, spark_df):
 
         plt.tight_layout()
 
-        plt.savefig("../outputs/figure1.png")
+        plt.savefig("outputs/common_words.png")
 
+        plt.show()
 
     # =====================================================
     # 15. SPARK SCHEMA
@@ -344,13 +370,21 @@ def perform_eda(df, spark_df):
     # 17. SPARK CATEGORY ANALYSIS
     # =====================================================
 
-    if category_col:
+    print("\n" + "="*60)
+    print("SPARK CATEGORY ANALYSIS")
+    print("="*60)
 
-        print("\n" + "="*60)
-        print("SPARK CATEGORY ANALYSIS")
-        print("="*60)
+    spark_category_col = None
 
-        spark_df.groupBy(category_col) \
+    if 'PRODUCT_TYPE_ID' in spark_df.columns:
+        spark_category_col = 'PRODUCT_TYPE_ID'
+
+    elif 'category' in spark_df.columns:
+        spark_category_col = 'category'
+
+    if spark_category_col:
+
+        spark_df.groupBy(spark_category_col) \
             .count() \
             .show()
 

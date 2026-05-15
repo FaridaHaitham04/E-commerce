@@ -78,6 +78,16 @@ def preprocess_data(df):
             subset=['product_name'],
             inplace=True
         )
+     # ================================================
+    # CONVERT PRODUCT LENGTH TO NUMERIC
+    # ================================================
+
+    if 'PRODUCT_LENGTH' in df.columns:
+
+        df['PRODUCT_LENGTH'] = pd.to_numeric(
+            df['PRODUCT_LENGTH'],
+            errors='coerce'
+        )
 
     print("Preprocessing Completed")
 
