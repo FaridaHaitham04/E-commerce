@@ -89,53 +89,7 @@ def perform_eda(df, spark_df):
     print(df.duplicated().sum())
 
     # =====================================================
-    # 7. PRODUCT PRICE DISTRIBUTION
-    # =====================================================
-
-    if 'PRICE' in df.columns:
-
-        plt.figure(figsize=(12,5))
-
-        sns.histplot(
-            df['PRICE'],
-            bins=50,
-            kde=True
-        )
-
-        plt.title("Product Price Distribution")
-
-        plt.xlabel("Price")
-
-        plt.ylabel("Count")
-
-        plt.tight_layout()
-
-        plt.savefig("outputs/price_distribution.png")
-
-        plt.show()
-
-    # =====================================================
-    # 8. PRICE OUTLIERS
-    # =====================================================
-
-    if 'PRICE' in df.columns:
-
-        plt.figure(figsize=(12,5))
-
-        sns.boxplot(
-            x=df['PRICE']
-        )
-
-        plt.title("Price Outliers")
-
-        plt.tight_layout()
-
-        plt.savefig("outputs/price_outliers.png")
-
-        plt.show()
-
-    # =====================================================
-    # 9. TOP PRODUCT CATEGORIES
+    # 7. TOP PRODUCT CATEGORIES
     # =====================================================
 
     category_col = None
@@ -175,7 +129,7 @@ def perform_eda(df, spark_df):
         plt.show()
 
     # =====================================================
-    # 10. TEXT LENGTH ANALYSIS
+    # 8. TEXT COLUMN DETECTION
     # =====================================================
 
     text_col = None
@@ -185,6 +139,10 @@ def perform_eda(df, spark_df):
 
     elif 'about_product' in df.columns:
         text_col = 'about_product'
+
+    # =====================================================
+    # 9. TEXT LENGTH DISTRIBUTION
+    # =====================================================
 
     if text_col:
 
@@ -215,7 +173,7 @@ def perform_eda(df, spark_df):
         plt.show()
 
     # =====================================================
-    # 11. PRODUCT NAME LENGTH ANALYSIS
+    # 10. PRODUCT NAME LENGTH DISTRIBUTION
     # =====================================================
 
     product_col = None
@@ -255,7 +213,7 @@ def perform_eda(df, spark_df):
         plt.show()
 
     # =====================================================
-    # 12. WORD CLOUD
+    # 11. WORD CLOUD
     # =====================================================
 
     if text_col:
@@ -286,7 +244,7 @@ def perform_eda(df, spark_df):
         plt.show()
 
     # =====================================================
-    # 13. CORRELATION ANALYSIS
+    # 12. CORRELATION MATRIX
     # =====================================================
 
     numeric_cols = df.select_dtypes(
@@ -314,19 +272,33 @@ def perform_eda(df, spark_df):
         plt.show()
 
     # =====================================================
-    # 14. MOST COMMON WORDS
+    # 13. MOST COMMON MEANINGFUL WORDS
     # =====================================================
 
     if text_col:
 
         from collections import Counter
+        from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
-        words = (
-            " ".join(df[text_col].astype(str))
-            .split()
+        # Combine all text
+        text = " ".join(
+            df[text_col].astype(str)
         )
 
-        common_words = Counter(words).most_common(20)
+        # Split words
+        words = text.split()
+
+        # Remove stopwords
+        filtered_words = [
+            word for word in words
+            if word not in ENGLISH_STOP_WORDS
+            and len(word) > 2
+        ]
+
+        # Count words
+        common_words = Counter(
+            filtered_words
+        ).most_common(20)
 
         words = [word[0] for word in common_words]
 
@@ -336,18 +308,18 @@ def perform_eda(df, spark_df):
 
         plt.bar(words, counts)
 
-        plt.title("Most Common Words")
+        plt.title("Most Common Meaningful Words")
 
         plt.xticks(rotation=45)
 
         plt.tight_layout()
 
-        plt.savefig("outputs/common_words.png")
+        plt.savefig("outputs/common_meaningful_words.png")
 
         plt.show()
 
     # =====================================================
-    # 15. SPARK SCHEMA
+    # 14. SPARK SCHEMA
     # =====================================================
 
     print("\n" + "="*60)
@@ -357,7 +329,7 @@ def perform_eda(df, spark_df):
     spark_df.printSchema()
 
     # =====================================================
-    # 16. SPARK SUMMARY STATISTICS
+    # 15. SPARK SUMMARY STATISTICS
     # =====================================================
 
     print("\n" + "="*60)
@@ -367,7 +339,7 @@ def perform_eda(df, spark_df):
     spark_df.describe().show()
 
     # =====================================================
-    # 17. SPARK CATEGORY ANALYSIS
+    # 16. SPARK CATEGORY ANALYSIS
     # =====================================================
 
     print("\n" + "="*60)
@@ -389,7 +361,7 @@ def perform_eda(df, spark_df):
             .show()
 
     # =====================================================
-    # 18. FINAL DATASET SUMMARY
+    # 17. FINAL DATASET SUMMARY
     # =====================================================
 
     print("\n" + "="*60)
